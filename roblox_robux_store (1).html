@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Roblox | Robux Store</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter / Builder Sans feel -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            roblox: ['"Hanken Grotesk"', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            robloxBlue: '#2563EB',
+            robloxBlueHover: '#1D4ED8',
+            robloxLightGray: '#E5E7EB',
+            robloxPillBg: '#F3F4F6',
+            robloxTextDark: '#111827',
+            robloxTextGray: '#6B7280',
+            robloxCardBorder: '#E5E7EB',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      background-color: #FAFAFB;
+    }
+
+    /* Subtle background contour wave pattern matching screenshot */
+    .bg-topo {
+      background-image: radial-gradient(#d1d5db 0.75px, transparent 0.75px), radial-gradient(#e5e7eb 0.75px, #FAFAFB 0.75px);
+      background-size: 30px 30px;
+      background-position: 0 0, 15px 15px;
+    }
+
+    /* Roblox hexagon icon */
+    .robux-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Keyframe animations for spinner & pulse */
+    @keyframes spin-slow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+      animation: spin-slow 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .pop-in {
+      animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes bounceSuccess {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+    .bounce-success {
+      animation: bounceSuccess 1.2s ease;
+    }
+  </style>
+</head>
+<body class="bg-topo text-robloxTextDark min-h-screen flex flex-col items-center pb-16 antialiased">
+
+  <!-- Top Minimal Roblox Header -->
+  <header class="w-full bg-white/95 backdrop-blur-md sticky top-0 z-30 border-b border-gray-200/80 px-4 py-3 flex items-center justify-between shadow-xs">
+    <div class="flex items-center space-x-3">
+      <!-- Roblox Square Logo SVG -->
+      <div class="w-7 h-7 bg-black rounded-md flex items-center justify-center shadow-xs">
+        <div class="w-2.5 h-2.5 bg-white transform rotate-12 rounded-xs"></div>
+      </div>
+      <span class="font-black text-xl tracking-tight text-gray-900">ROBLOX</span>
+    </div>
+
+    <!-- Right Header Balance Pill -->
+    <div class="flex items-center bg-gray-100 hover:bg-gray-200/80 transition-colors px-3 py-1.5 rounded-full border border-gray-200">
+      <svg class="w-4 h-4 mr-1.5 text-gray-900" viewBox="0 0 24 24" fill="currentColor">
+        <path fill-rule="evenodd" d="M12 2.25a2 2 0 0 0-1 .27L4.2 6.55a2 2 0 0 0-1 1.73v7.44a2 2 0 0 0 1 1.73l6.8 4.03a2 2 0 0 0 2 0l6.8-4.03a2 2 0 0 0 1-1.73V8.28a2 2 0 0 0-1-1.73l-6.8-4.03a2 2 0 0 0-1-.27ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" clip-rule="evenodd" />
+      </svg>
+      <span id="currentBalanceDisplay" class="text-xs font-bold text-gray-800">0 R$</span>
+    </div>
+  </header>
+
+  <main class="w-full max-w-md px-4 pt-6 flex flex-col space-y-6">
+    <!-- Hero Title -->
+    <div class="text-center pt-2 pb-1">
+      <h1 class="text-3xl sm:text-[34px] font-black tracking-tight leading-tight text-gray-900">
+        Enjoy up to 25%<br>more Robux
+      </h1>
+      <p class="text-xs font-medium text-gray-500 mt-2">Special promotional offers available for your account</p>
+    </div>
+
+    <!-- Section 1: Bonus item we picked for you -->
+    <section class="flex flex-col space-y-2.5">
+      <h2 class="text-lg font-bold text-gray-900 tracking-tight pl-0.5">
+        Bonus item we picked for you
+      </h2>
+
+      <!-- Main Bonus Card -->
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden transition-all duration-200">
+        <!-- Squid Game X Dark Banner -->
+        <div class="relative bg-gradient-to-r from-[#170a09] via-[#2d110e] to-[#120706] p-3.5 flex items-center justify-between text-white overflow-hidden border-b border-gray-100">
+          <div class="flex items-center space-x-3 z-10">
+            <!-- Icon circle -->
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-600 to-orange-600 flex items-center justify-center p-2 shadow-inner border border-red-400/40">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div>
+              <div class="flex items-center space-x-1">
+                <span class="text-xs font-bold tracking-tight text-white">[🚀] Squid Game X</span>
+                <svg class="w-3.5 h-3.5 text-gray-400 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div class="text-[11px] text-gray-300 font-medium">Extra Speed</div>
+            </div>
+          </div>
+
+          <!-- Banner background text watermark -->
+          <div class="absolute right-3 font-black text-2xl tracking-widest text-white/5 pointer-events-none select-none uppercase">
+            Season 3
+          </div>
+        </div>
+
+        <!-- Package Rows Container -->
+        <div class="divide-y divide-gray-100/90">
+          <!-- Row 24 000 Robux (Hero Blue button) -->
+          <div class="p-3.5 sm:p-4 flex items-center justify-between hover:bg-gray-50/70 transition-colors">
+            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+              <div class="flex items-center space-x-1.5 font-bold text-gray-900 text-base">
+                <!-- Robux Icon -->
+                <svg class="w-4 h-4 text-black flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path fill-rule="evenodd" d="M12 2.25a2 2 0 0 0-1 .27L4.2 6.55a2 2 0 0 0-1 1.73v7.44a2 2 0 0 0 1 1.73l6.8 4.03a2 2 0 0 0 2 0l6.8-4.03a2 2 0 0 0 1-1.73V8.28a2 2 0 0 0-1-1.73l-6.8-4.03a2 2 0 0 0-1-.27ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" clip-rule="evenodd" />
+                </svg>
+                <span>24 000</span>
+              </div>
+              <span class="text-xs text-gray-400 line-through font-medium">22 500</span>
+              <span class="text-[10px] font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full border border-gray-200">
+                + 1 500 more
+              </span>
+              <span class="text-[10px] font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full border border-gray-200 flex items-center space-x-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                <span>For you</span>
+              </span>
+            </div>
+
+            <!-- Price button (0.00$) -->
+            <button onclick="openModal('24 000')" class="ml-2 flex-shrink-0 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-xs transition-all">
+              0,00 $
+            </button>
+          </div>
+
+          <!-- Row 11 000 Robux -->
+          <div class="p-3.5 sm:p-4 flex items-center justify-between hover:bg-gray-50/70 transition-colors">
+            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+              <div class="flex items-center space-x-1.5 font-bold text-gray-900 text-base">
+                <svg class="w-4 h-4 text-black flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path fill-rule="evenodd" d="M12 2.25a2 2 0 0 0-1 .27L4.2 6.55a2 2 0 0 0-1 1.73v7.44a2 2 0 0 0 1 1.73l6.8 4.03a2 2 0 0 0 2 0l6.8-4.03a2 2 0 0 0 1-1.73V8.28a2 2 0 0 0-1-1.73l-6.8-4.03a2 2 0 0 0-1-.27ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" clip-rule="evenodd" />
+                </svg>
+                <span>11 000</span>
+              </div>
+              <span class="text-xs text-gray-400 line-through font-medium">10 000</span>
+              <span class="text-[10px] font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full border border-gray-200">
+                + 1 000 more
+              </span>
+            </div>
+
+            <button onclick="openModal('11 000')" class="ml-2 flex-shrink-0 bg-gray-200 hover:bg-gray-300 active:scale-95 text-gray-900 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all">
+              0,00 $
+            </button>
+          </div>
+
+          <!-- Row 5 250 Robux -->
+          <div class="p-3.5 sm:p-4 flex items-center justify-between hover:bg-gray-50/70 transition-colors">
+            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+              <div class="flex items-center space-x-1.5 font-bold text-gray-900 text-base">
+                <svg class="w-4 h-4 text-black flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path fill-rule="evenodd" d="M12 2.25a2 2 0 0 0-1 .27L4.2 6.55a2 2 0 0 0-1 1.73v7.44a2 2 0 0 0 1 1.73l6.8 4.03a2 2 0 0 0 2 0l6.8-4.03a2 2 0 0 0 1-1.73V8.28a2 2 0 0 0-1-1.73l-6.8-4.03a2 2 0 0 0-1-.27ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" clip-rule="evenodd" />
+                </svg>
+                <span>5 250</span>
+              </div>
+              <span class="text-xs text-gray-400 line-through font-medium">4 500</span>
+              <span class="text-[10px] font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full border border-gray-200">
+                + 750 more
+              </span>
+            </div>
+
+            <button onclick="openModal('5 250')" class="ml-2 flex-shrink-0 bg-gray-200 hover:bg-gray-300 active:scale-95 text-gray-900 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all">
+              0,00 $
+            </button>
+          </div>
+
+          <!-- Row 3 625 Robux -->
+          <div class="p-3.5 sm:p-4 flex items-center justify-between hover:bg-gray-50/70 transition-colors">
+            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+              <div class="flex items-center space-x-1.5 font-bold text-gray-900 text-base">
+                <svg class="w-4 h-4 text-black flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path fill-rule="evenodd" d="M12 2.25a2 2 0 0 0-1 .27L4.2 6.55a2 2 0 0 0-1 1.73v7.44a2 2 0 0 0 1 1.73l6.8 4.03a2 2 0 0 0 2 0l6.8-4.03a2 2 0 0 0 1-1.73V8.28a2 2 0 0 0-1-1.73l-6.8-4.03a2 2 0 0 0-1-.27ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" clip-rule="evenodd" />
+                </svg>
+                <span>3 625</span>
+              </div>
+              <span class="text-xs text-gray-400 line-through font-medium">3 150</span>
+              <span class="text-[10px] font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full border border-gray-200">
+                + 475 more
+              </span>
+            </div>
+
+            <button onclick="openModal('3 625')" class="ml-2 flex-shrink-0 bg-gray-200 hover:bg-gray-300 active:scale-95 text-gray-900 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all">
+              0,00 $
+            </button>
+          </div>
+
+          <!-- Row 2 000 Robux -->
+          <div class="p-3.5 sm:p-4 flex items-center justify-between hover:bg-gray-50/70 transition-colors">
+            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+              <div class="flex items-center space-x-1.5 font-bold text-gray-900 text-base">
+                <svg class="w-4 h-4 text-black flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path fill-rule="evenodd" d="M12 2.25a2 2 0 0 0-1 .27L4.2 6.55a2 2 0 0 0-1 1.73v7.44a2 2 0 0 0 1 1.73l6.8 4.03a2 2 0 0 0 2 0l6.8-4.03a2 2 0 0 0 1-1.73V8.28a2 2 0 0 0-1-1.73l-6.8-4.03a2 2 0 0 0-1-.27ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" clip-rule="evenodd" />
+                </svg>
+                <span>2 000</span>
+              </div>
+              <span class="text-xs text-gray-400 line-through font-medium">1 700</span>
+              <span class="text-[10px] font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full border border-gray-200">
+                + 300 more
+              </span>
+            </div>
+
+            <button onclick="openModal('2 000')" class="ml-2 flex-shrink-0 bg-gray-200 hover:bg-gray-300 active:scale-95 text-gray-900 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all">
+              0,00 $
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Robux packages -->
+    <section class="flex flex-col space-y-2.5 pt-1">
+      <h2 class="text-lg font-bold text-gray-900 tracking-tight pl-0.5">
+        Robux packages
+      </h2>
+
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden divide-y divide-gray-100/90">
+        <!-- 1 500 Robux -->
+        <div class="p-3.5 sm:p-4 flex items-center justify-between hover:bg-gray-50/70 transition-colors">
+          <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+            <div class="flex items-center space-x-1.5 font-bold text-gray-900 text-base">
+              <svg class="w-4 h-4 text-black flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd" d="M12 2.25a2 2 0 0 0-1 .27L4.2 6.55a2 2 0 0 0-1 1.73v7.44a2 2 0 0 0 1 1.73l6.8 4.03a2 2 0 0 0 2 0l6.8-4.03a2 2 0 0 0 1-1.73V8.28a2 2 0 0 0-1-1.73l-6.8-4.03a2 2 0 0 0-1-.27ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" clip-rule="evenodd" />
+              </svg>
+              <span>1 500</span>
+            </div>
+            <span class="text-xs text-gray-400 line-through font-medium">1 200</span>
+            <span class="text-[10px] font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full border border-gray-200">
+              + 300 more
+            </span>
+          </div>
+
+          <button onclick="openModal('1 500')" class="ml-2 flex-shrink-0 bg-gray-200 hover:bg-gray-300 active:scale-95 text-gray-900 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all">
+            0,00 $
+          </button>
+        </div>
+
+        <!-- 1 000 Robux -->
+        <div class="p-3.5 sm:p-4 flex items-center justify-between hover:bg-gray-50/70 transition-colors">
+          <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+            <div class="flex items-center space-x-1.5 font-bold text-gray-900 text-base">
+              <svg class="w-4 h-4 text-black flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd" d="M12 2.25a2 2 0 0 0-1 .27L4.2 6.55a2 2 0 0 0-1 1.73v7.44a2 2 0 0 0 1 1.73l6.8 4.03a2 2 0 0 0 2 0l6.8-4.03a2 2 0 0 0 1-1.73V8.28a2 2 0 0 0-1-1.73l-6.8-4.03a2 2 0 0 0-1-.27ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" clip-rule="evenodd" />
+              </svg>
+              <span>1 000</span>
+            </div>
+            <span class="text-xs text-gray-400 line-through font-medium">800</span>
+            <span class="text-[10px] font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full border border-gray-200">
+              + 200 more
+            </span>
+          </div>
+
+          <button onclick="openModal('1 000')" class="ml-2 flex-shrink-0 bg-gray-200 hover:bg-gray-300 active:scale-95 text-gray-900 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all">
+            0,00 $
+          </button>
+        </div>
+
+        <!-- 500 Robux -->
+        <div class="p-3.5 sm:p-4 flex items-center justify-between hover:bg-gray-50/70 transition-colors">
+          <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+            <div class="flex items-center space-x-1.5 font-bold text-gray-900 text-base">
+              <svg class="w-4 h-4 text-black flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd" d="M12 2.25a2 2 0 0 0-1 .27L4.2 6.55a2 2 0 0 0-1 1.73v7.44a2 2 0 0 0 1 1.73l6.8 4.03a2 2 0 0 0 2 0l6.8-4.03a2 2 0 0 0 1-1.73V8.28a2 2 0 0 0-1-1.73l-6.8-4.03a2 2 0 0 0-1-.27ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" clip-rule="evenodd" />
+              </svg>
+              <span>500</span>
+            </div>
+            <span class="text-xs text-gray-400 line-through font-medium">400</span>
+            <span class="text-[10px] font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full border border-gray-200">
+              + 100 more
+            </span>
+          </div>
+
+          <button onclick="openModal('500')" class="ml-2 flex-shrink-0 bg-gray-200 hover:bg-gray-300 active:scale-95 text-gray-900 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all">
+            0,00 $
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer info -->
+    <div class="text-center text-xs text-gray-400 py-4">
+      <p>© 2026 Roblox Corporation. All rights reserved.</p>
+      <p class="mt-1">Terms of Use • Privacy Policy</p>
+    </div>
+  </main>
+
+  <!-- MODAL / BOTTOM SHEET -->
+  <div id="claimModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
+    <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl pop-in border border-gray-200 max-h-[92vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+        <div class="flex items-center space-x-2">
+          <div class="w-6 h-6 bg-black rounded flex items-center justify-center">
+            <div class="w-2 h-2 bg-white transform rotate-12"></div>
+          </div>
+          <h3 class="text-lg font-extrabold text-gray-900">Roblox Checkout</h3>
+        </div>
+        <button id="closeModalBtn" onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1.5 rounded-full hover:bg-gray-100 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Content State: Username Form -->
+      <div id="formSection" class="pt-4 space-y-5">
+        <!-- Selected Pack Info -->
+        <div class="bg-blue-50/70 border border-blue-100 rounded-2xl p-4 flex items-center justify-between">
+          <div>
+            <div class="text-xs text-blue-700 font-semibold uppercase tracking-wider">Selected Package</div>
+            <div class="flex items-center space-x-1.5 font-black text-gray-900 text-lg mt-0.5">
+              <svg class="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd" d="M12 2.25a2 2 0 0 0-1 .27L4.2 6.55a2 2 0 0 0-1 1.73v7.44a2 2 0 0 0 1 1.73l6.8 4.03a2 2 0 0 0 2 0l6.8-4.03a2 2 0 0 0 1-1.73V8.28a2 2 0 0 0-1-1.73l-6.8-4.03a2 2 0 0 0-1-.27ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" clip-rule="evenodd" />
+              </svg>
+              <span id="selectedRobuxAmount">24 000</span>
+              <span class="text-sm font-bold text-gray-500">Robux</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-gray-400 font-medium line-through">199.99 $</div>
+            <div class="text-xl font-black text-emerald-600">0.00 $</div>
+          </div>
+        </div>
+
+        <!-- Input for Roblox Username -->
+        <div class="space-y-1.5">
+          <label for="usernameInput" class="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+            Enter your Roblox Username
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <input 
+              type="text" 
+              id="usernameInput"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Roblox Username"
+              class="w-full pl-11 pr-4 py-3.5 bg-gray-50 focus:bg-white text-gray-900 font-semibold rounded-2xl border border-gray-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-base"
+            >
+          </div>
+          <p class="text-[11px] text-gray-400 pl-1">No password needed. Robux will be transferred by username.</p>
+        </div>
+
+        <!-- Submit Button (Disabled gray by default, turns blue on input) -->
+        <div class="pt-2">
+          <button 
+            id="getRobuxBtn" 
+            disabled 
+            onclick="startClaimProcess()"
+            class="w-full py-4 rounded-2xl font-black text-base tracking-wide transition-all duration-200 flex items-center justify-center space-x-2 bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
+          >
+            <span>Get Robux</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Content State: Progress & Processing -->
+      <div id="progressSection" class="hidden pt-6 pb-4 flex flex-col items-center text-center space-y-6">
+        
+        <!-- Animated Icon Container -->
+        <div class="relative w-24 h-24 flex items-center justify-center">
+          <!-- Spinner Ring -->
+          <div id="spinnerRing" class="absolute inset-0 rounded-full border-4 border-gray-100 border-t-blue-600 animate-spin"></div>
+          
+          <!-- Inner Icon / Roblox Symbol -->
+          <div id="statusIcon" class="w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center transition-all">
+            <svg class="w-8 h-8 text-blue-600 animate-spin-slow" viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" d="M12 2.25a2 2 0 0 0-1 .27L4.2 6.55a2 2 0 0 0-1 1.73v7.44a2 2 0 0 0 1 1.73l6.8 4.03a2 2 0 0 0 2 0l6.8-4.03a2 2 0 0 0 1-1.73V8.28a2 2 0 0 0-1-1.73l-6.8-4.03a2 2 0 0 0-1-.27ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Status Texts -->
+        <div class="space-y-2">
+          <h4 id="statusTitle" class="text-xl font-extrabold text-gray-900 tracking-tight">
+            Syncing account...
+          </h4>
+          <div class="flex items-center justify-center space-x-1 text-sm font-semibold text-gray-500">
+            <span>Account:</span>
+            <span id="targetUserBadge" class="text-blue-600 font-bold bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">Player</span>
+          </div>
+        </div>
+
+        <!-- Steps Progress Bar -->
+        <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden p-0.5">
+          <div id="progressBarFill" class="bg-blue-600 h-full rounded-full transition-all duration-700 ease-out" style="width: 25%;"></div>
+        </div>
+
+        <!-- Timer / Alert Note -->
+        <div id="completionNotice" class="hidden text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 rounded-xl py-2 px-4 w-full">
+          Resetting page in <span id="countdownTimer" class="font-bold">5</span> seconds...
+        </div>
+      </div>
+
+      <!-- Content State: Progress & Processing -->
+      <div id="progressSection" class="hidden pt-6 pb-4 flex flex-col items-center text-center space-y-6">
+        
+        <!-- Animated Icon Container -->
+        <div class="relative w-24 h-24 flex items-center justify-center">
+          <!-- Spinner Ring -->
+          <div id="spinnerRing" class="absolute inset-0 rounded-full border-4 border-gray-100 border-t-blue-600 animate-spin"></div>
+          
+          <!-- Inner Icon / Roblox Symbol -->
+          <div id="statusIcon" class="w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center transition-all">
+            <svg class="w-8 h-8 text-blue-600 animate-spin-slow" viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" d="M12 2.25a2 2 0 0 0-1 .27L4.2 6.55a2 2 0 0 0-1 1.73v7.44a2 2 0 0 0 1 1.73l6.8 4.03a2 2 0 0 0 2 0l6.8-4.03a2 2 0 0 0 1-1.73V8.28a2 2 0 0 0-1-1.73l-6.8-4.03a2 2 0 0 0-1-.27ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Status Texts -->
+        <div class="space-y-2">
+          <h4 id="statusTitle" class="text-xl font-extrabold text-gray-900 tracking-tight">
+            Синхронизируем аккаунт
+          </h4>
+          <div class="flex items-center justify-center space-x-1 text-sm font-semibold text-gray-500">
+            <span>Аккаунт:</span>
+            <span id="targetUserBadge" class="text-blue-600 font-bold bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">Player</span>
+          </div>
+        </div>
+
+        <!-- Steps Progress Bar -->
+        <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden p-0.5">
+          <div id="progressBarFill" class="bg-blue-600 h-full rounded-full transition-all duration-700 ease-out" style="width: 25%;"></div>
+        </div>
+
+        <!-- Timer / Alert Note -->
+        <div id="completionNotice" class="hidden text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 rounded-xl py-2 px-4 w-full">
+          Перезагрузка страницы через <span id="countdownTimer" class="font-bold">5</span> сек...
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // State variables
+    let currentSelectedPack = '24 000';
+    let countdownInterval = null;
+
+    const modal = document.getElementById('claimModal');
+    const formSection = document.getElementById('formSection');
+    const progressSection = document.getElementById('progressSection');
+    const usernameInput = document.getElementById('usernameInput');
+    const getRobuxBtn = document.getElementById('getRobuxBtn');
+    const selectedRobuxAmount = document.getElementById('selectedRobuxAmount');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    const statusTitle = document.getElementById('statusTitle');
+    const targetUserBadge = document.getElementById('targetUserBadge');
+    const progressBarFill = document.getElementById('progressBarFill');
+    const spinnerRing = document.getElementById('spinnerRing');
+    const statusIcon = document.getElementById('statusIcon');
+    const completionNotice = document.getElementById('completionNotice');
+    const countdownTimer = document.getElementById('countdownTimer');
+    const currentBalanceDisplay = document.getElementById('currentBalanceDisplay');
+
+    // Open Modal
+    function openModal(packAmount) {
+      currentSelectedPack = packAmount;
+      selectedRobuxAmount.innerText = packAmount;
+      
+      // Reset input and state
+      usernameInput.value = '';
+      updateButtonState();
+
+      // Show form section, hide progress
+      formSection.classList.remove('hidden');
+      progressSection.classList.add('hidden');
+      closeModalBtn.classList.remove('hidden');
+      completionNotice.classList.add('hidden');
+      
+      // Reset spinner & bar
+      spinnerRing.classList.remove('hidden');
+      progressBarFill.style.width = '20%';
+      progressBarFill.className = 'bg-blue-600 h-full rounded-full transition-all duration-700 ease-out';
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      // Autofocus input
+      setTimeout(() => {
+        usernameInput.focus();
+      }, 150);
+    }
+
+    // Close Modal
+    function closeModal() {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // Monitor input changes to toggle button state
+    usernameInput.addEventListener('input', function() {
+      updateButtonState();
+    });
+
+    function updateButtonState() {
+      const username = usernameInput.value.trim();
+      if (username.length > 0) {
+        // Active Blue State
+        getRobuxBtn.disabled = false;
+        getRobuxBtn.className = 'w-full py-4 rounded-2xl font-black text-base tracking-wide transition-all duration-200 flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white shadow-lg shadow-blue-500/30 cursor-pointer';
+      } else {
+        // Disabled Gray State
+        getRobuxBtn.disabled = true;
+        getRobuxBtn.className = 'w-full py-4 rounded-2xl font-black text-base tracking-wide transition-all duration-200 flex items-center justify-center space-x-2 bg-gray-200 text-gray-400 cursor-not-allowed shadow-none';
+      }
+    }
+
+    // Handle "Get Robux" submission sequence
+    function startClaimProcess() {
+      const username = usernameInput.value.trim();
+      if (!username) return;
+
+      // Switch to progress view
+      formSection.classList.add('hidden');
+      closeModalBtn.classList.add('hidden'); // prevent closing mid-process
+      progressSection.classList.remove('hidden');
+
+      targetUserBadge.innerText = '@' + username;
+
+      // STEP 1: Syncing account
+      statusTitle.innerText = 'Syncing account...';
+      progressBarFill.style.width = '30%';
+
+      // STEP 2: Sending Robux to account
+      setTimeout(() => {
+        statusTitle.innerText = 'Sending Robux to account...';
+        progressBarFill.style.width = '70%';
+        
+        // Minor pulse animation on step change
+        statusIcon.classList.add('scale-110');
+        setTimeout(() => statusIcon.classList.remove('scale-110'), 250);
+      }, 2500);
+
+      // STEP 3: Robux added to account
+      setTimeout(() => {
+        statusTitle.innerText = 'Robux added to account!';
+        progressBarFill.style.width = '100%';
+        progressBarFill.classList.remove('bg-blue-600');
+        progressBarFill.classList.add('bg-emerald-500');
+
+        // Hide spinner ring and show success checkmark
+        spinnerRing.classList.add('hidden');
+        statusIcon.className = 'w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center transition-all bounce-success shadow-lg shadow-emerald-500/20';
+        statusIcon.innerHTML = `
+          <svg class="w-9 h-9 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+          </svg>
+        `;
+
+        // Update header balance to reflect the claimed package
+        currentBalanceDisplay.innerText = currentSelectedPack + ' R$';
+        currentBalanceDisplay.classList.add('text-blue-600');
+
+        // Show 5-second countdown notice and then reset back to default
+        completionNotice.classList.remove('hidden');
+        let timeLeft = 5;
+        countdownTimer.innerText = timeLeft;
+
+        countdownInterval = setInterval(() => {
+          timeLeft -= 1;
+          if (timeLeft >= 0) {
+            countdownTimer.innerText = timeLeft;
+          }
+          if (timeLeft <= 0) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+            // Reset page back to initial state
+            closeModal();
+            // Reset balance in header back to initial after full reset
+            currentBalanceDisplay.innerText = '0 R$';
+            currentBalanceDisplay.classList.remove('text-blue-600');
+            // Reset modal icon
+            statusIcon.className = 'w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center transition-all';
+            statusIcon.innerHTML = `
+              <svg class="w-8 h-8 text-blue-600 animate-spin-slow" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd" d="M12 2.25a2 2 0 0 0-1 .27L4.2 6.55a2 2 0 0 0-1 1.73v7.44a2 2 0 0 0 1 1.73l6.8 4.03a2 2 0 0 0 2 0l6.8-4.03a2 2 0 0 0 1-1.73V8.28a2 2 0 0 0-1-1.73l-6.8-4.03a2 2 0 0 0-1-.27ZM12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" clip-rule="evenodd" />
+              </svg>
+            `;
+          }
+        }, 1000);
+
+      }, 5000);
+    }
+
+    // Close on clicking backdrop
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal && !closeModalBtn.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
